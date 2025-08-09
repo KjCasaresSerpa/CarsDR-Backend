@@ -1,0 +1,32 @@
+name: Auto-create PR to upstream deploy branch on deploy push
+
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          ref: deploy
+
+      - name: Create Pull Request to upstream
+        uses: peter-evans/create-pull-request@v5
+        with:
+          # Token con acceso al repo upstream (o usar GITHUB_TOKEN si tu Action corre en el fork y tiene permiso)
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Indicar repo base (upstream)
+          repository: YeinsM/CarsDR-Backend
+          base: deploy   # rama del repo base
+          head: deploy   # rama de tu fork (origin deploy)
+          title: 'Auto PR from fork deploy branch'
+          body: |
+            This PR was automatically created from the deploy branch of the fork.
+          draft: false
+          # Se puede añadir para evitar PR duplicados
+          # si ya existe uno abierto, no crear otro
+          # behavior: 'update'
